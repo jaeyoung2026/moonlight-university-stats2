@@ -34,19 +34,18 @@
           const university = String(item.university || '').trim();
           if (!university || !timeStr) continue;
           
-          // ISO 8601 형식: 2025-11-25T08:08:45.000Z (이미 KST)
+          // ISO 8601 형식: 2025-11-25T08:08:45.000Z
           let match = timeStr.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
           if (match) {
-            const year = parseInt(match[1]);
-            const month = parseInt(match[2]);
-            const day = parseInt(match[3]);
-            const hour = parseInt(match[4]);
+            const dateObj = new Date(timeStr);
+            // UTC를 KST로 변환 (+9시간)
+            const kstDate = new Date(dateObj.getTime() + (9 * 60 * 60 * 1000));
             records.push({ 
-              year: year, 
-              month: month, 
-              day: day, 
-              hour: hour, 
-              date: new Date(year, month - 1, day), 
+              year: kstDate.getFullYear(), 
+              month: kstDate.getMonth() + 1, 
+              day: kstDate.getDate(), 
+              hour: kstDate.getHours(), 
+              date: new Date(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()), 
               university: university 
             });
             univSet.add(university);
