@@ -38,14 +38,12 @@
           let match = timeStr.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
           if (match) {
             const dateObj = new Date(timeStr);
-            // UTC를 KST로 변환 (+9시간)
-            const kstDate = new Date(dateObj.getTime() + (9 * 60 * 60 * 1000));
             records.push({ 
-              year: kstDate.getFullYear(), 
-              month: kstDate.getMonth() + 1, 
-              day: kstDate.getDate(), 
-              hour: kstDate.getHours(), 
-              date: new Date(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()), 
+              year: dateObj.getFullYear(), 
+              month: dateObj.getMonth() + 1, 
+              day: dateObj.getDate(), 
+              hour: dateObj.getHours(), 
+              date: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()), 
               university: university 
             });
             univSet.add(university);
