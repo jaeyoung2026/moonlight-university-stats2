@@ -317,9 +317,9 @@
 
       const data = useMemo(function() {
         if (filteredRecords.length === 0) return null;
-        const sortedRecords = filteredRecords.slice().sort(function(a, b) { return a.date - b.date; });
-        const startDate = sortedRecords[0].date;
-        const endDate = sortedRecords[sortedRecords.length - 1].date;
+        // 고정 날짜 범위: 11/25 ~ 12/10
+        const startDate = new Date(2025, 10, 25); // 11월 25일 (월은 0부터 시작)
+        const endDate = new Date(2025, 11, 10);   // 12월 10일
         const dates = [];
         const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
         const currentDate = new Date(startDate);
