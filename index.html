@@ -319,11 +319,11 @@
         if (filteredRecords.length === 0) return null;
         // 고정 날짜 범위: 11/25 ~ 12/10
         const startDate = new Date(2025, 10, 25); // 11월 25일 (월은 0부터 시작)
-        const endDate = new Date(2025, 11, 10);   // 12월 10일
+        const endDate = new Date(2025, 11, 11);   // 12월 11일 (10일까지 포함하기 위해)
         const dates = [];
         const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
         const currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
+        while (currentDate < endDate) {
           dates.push({
             key: (currentDate.getMonth() + 1) + '/' + currentDate.getDate(),
             dayName: dayNames[currentDate.getDay()],
