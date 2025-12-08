@@ -13,8 +13,184 @@
   <div id="root"></div>
   <script type="text/babel">
     const { useState, useCallback, useMemo, useEffect } = React;
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzQYpAkNsl1u44t80SCu584Ms7zfZAQ92uttM2VFWYtbUMHbTojhvq_TZT_0gEgxY05/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwBbBnxoTBv6G1BFqUBLtySKJitgnpNujd4Kp-lqdQYW4HhS9DsS2kqO3jqerV_ZhNg/exec';
+    
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1NuTdFE4z58q599xCByoUP6oLejwCurvjzgztwSSWMAM/edit';
+
+    // 도메인 → 학교명 매핑 테이블
+    const DOMAIN_TO_UNIVERSITY = {
+      // 서울 주요대
+      'snu.ac.kr': '서울대학교',
+      'yonsei.ac.kr': '연세대학교',
+      'yuhs.ac': '연세대학교',
+      'o365.yonsei.ac.kr': '연세대학교',
+      'korea.ac.kr': '고려대학교',
+      'skku.edu': '성균관대학교',
+      'g.skku.edu': '성균관대학교',
+      'o.skku.edu': '성균관대학교',
+      'hanyang.ac.kr': '한양대학교',
+      'hansung.ac.kr': '한성대학교',
+      'cau.ac.kr': '중앙대학교',
+      'khu.ac.kr': '경희대학교',
+      'khcu.ac.kr': '경희사이버대학교',
+      'konkuk.ac.kr': '건국대학교',
+      'ewha.ac.kr': '이화여자대학교',
+      'ewhain.net': '이화여자대학교',
+      'i.ewha.ac.kr': '이화여자대학교',
+      'g.seoultech.ac.kr': '서울과학기술대학교',
+      'seoultech.ac.kr': '서울과학기술대학교',
+      'kau.kr': '한국항공대학교',
+      'sunmoon.ac.kr': '선문대학교',
+      'swu.ac.kr': '서울여자대학교',
+      'kmu.ac.kr': '계명대학교',
+      'stu.kmu.ac.kr': '계명대학교',
+      'kyonggi.ac.kr': '경기대학교',
+      'kyungsung.ac.kr': '경성대학교',
+      'knue.ac.kr': '한국교원대학교',
+      'chauniv.ac.kr': '차의과학대학교',
+      'assist.ac.kr': '서울과학종합대학원대학교',
+      'stud.assist.ac.kr': '서울과학종합대학원대학교',
+      'stud.assist.edu.kr': '서울과학종합대학원대학교',
+      'mju.ac.kr': '명지대학교',
+      'u.sogang.ac.kr': '서강대학교',
+      'sogang.ac.kr': '서강대학교',
+      'sungshin.ac.kr': '성신여자대학교',
+      'uos.ac.kr': '서울시립대학교',
+      'dongguk.edu': '동국대학교',
+      'dgu.ac.kr': '동국대학교',
+      'hongik.ac.kr': '홍익대학교',
+      'g.hongik.ac.kr': '홍익대학교',
+      'sookmyung.ac.kr': '숙명여자대학교',
+      'hufs.ac.kr': '한국외국어대학교',
+      'dongduk.ac.kr': '동덕여자대학교',
+      'sju.ac.kr': '세종대학교',
+      'sejong.ac.kr': '세종대학교',
+      'catholic.ac.kr': '가톨릭대학교',
+      'cmcnu.or.kr': '가톨릭대학교',
+      'soongsil.ac.kr': '숭실대학교',
+      'ssu.com': '숭실대학교',
+      'ssu.ac.kr': '숭실대학교',
+      'tukorea.ac.kr': '한국공학대학교',
+      'pcu.ac.kr': '배재대학교',
+      'donga.ac.kr': '동아대학교',
+      'office.uhs.ac.kr': '협성대학교',
+      'knu.ac.kr': '경북대학교',
+      'kyungnam.ac.kr': '경남대학교',
+      'kangnam.ac.kr': '강남대학교',
+      'sangmyung.kr': '상명대학교',
+      'ds.ac.kr': '덕성여자대학교',
+      'duksung.ac.kr': '덕성여자대학교',
+      'ks.ac.kr': '경성대학교',
+      'cku.ac.kr': '가톨릭관동대학교',
+      'ut.ac.kr': '한국교통대학교',
+      'a.ut.ac.kr': '한국교통대학교',
+      'knou.ac.kr': '한국방송통신대학교',
+      'handong.ac.kr': '한동대학교',
+      'sch.ac.kr': '순천향대학교',
+      'koreatech.ac.kr': '한국기술교육대학교',
+      'gm.hannam.ac.kr': '한남대학교',
+
+      // 경기/인천
+      'ajou.ac.kr': '아주대학교',
+      'inha.ac.kr': '인하대학교',
+      'inha.edu': '인하대학교',
+      'office.inha.ac.kr': '인하대학교',
+      'gachon.ac.kr': '가천대학교',
+      'dankook.ac.kr': '단국대학교',
+      'kookmin.ac.kr': '국민대학교',
+      'kwangwoon.ac.kr': '광운대학교',
+      'kw.ac.kr': '광운대학교',
+      'inu.ac.kr': '인천대학교',
+      'suwon.ac.kr': '수원대학교',
+      'deu.ac.kr': '동의대학교',
+
+      // 과기원
+      'kaist.ac.kr': 'KAIST',
+      'postech.ac.kr': 'POSTECH',
+      'unist.ac.kr': 'UNIST',
+      'gist.ac.kr': 'GIST',
+      'gm.gist.ac.kr': 'GIST',
+      'gm.gist.kr': 'GIST',
+      'dgist.ac.kr': 'DGIST',
+      'kentech.ac.kr': 'KENTECH',
+
+      // 지방 국립대
+      'pusan.ac.kr': '부산대학교',
+      'kyungpook.ac.kr': '경북대학교',
+      'chonnam.ac.kr': '전남대학교',
+      'jnu.ac.kr': '전남대학교',
+      'cbnu.ac.kr': '충북대학교',
+      'cnu.ac.kr': '충남대학교',
+      'o.cnu.ac.kr': '충남대학교',
+      'gnu.ac.kr': '경상국립대학교',
+      'jbnu.ac.kr': '전북대학교',
+      'jejunu.ac.kr': '제주대학교',
+      'kangwon.ac.kr': '강원대학교',
+      'pukyong.ac.kr': '국립부경대학교',
+      'pknu.ac.kr': '국립부경대학교',
+      'kongju.ac.kr': '국립공주대학교',
+      'smail.kongju.ac.kr': '국립공주대학교',
+      'kumoh.ac.kr': '국립금오공과대학교',
+      'edu.dju.ac.kr': '대전대학교',
+      'office.hknu.ac.kr': '한경국립대학교',
+      'knuh.ac.kr': '한국전통문화대학교',
+      'hanbat.ac.kr': '국립한밭대학교',
+      'mail.ube.ac.kr': '국제뇌교육종합대학원대학교',
+
+      // 지방 사립대
+      'yu.ac.kr': '영남대학교',
+      'inje.ac.kr': '인제대학교',
+      'dau.ac.kr': '동아대학교',
+      'ulsan.ac.kr': '울산대학교',
+      'mail.ulsan.ac.kr': '울산대학교',
+      'hs.ac.kr': '한신대학교',
+      'daegu.ac.kr': '대구대학교',
+      'chosun.ac.kr': '조선대학교',
+      'chosun.kr': '조선대학교',
+      'chungbuk.ac.kr': '충북대학교',
+      'jj.co.kr': '전주대학교',
+      'jj.ac.kr': '전주대학교',
+      'office.jejunu.ac.kr': '제주대학교',
+      'stu.jejunu.ac.kr': '제주대학교',
+      'cu.ac.kr': '대구가톨릭대학교',
+      'g.kmou.ac.kr': '한국해양대학교',
+      'changwon.ac.kr': '창원대학교',
+      'gs.cwnu.ac.kr': '창원대학교',
+      'mokpo.ac.kr': '목포대학교',
+      'vision.hoseo.edu': '호서대학교',
+      'kunsan.ac.kr': '군산대학교',
+      'gwnu.ac.kr': '강릉원주대학교',
+      'student.cnue.ac.kr': '춘천교육대학교',
+    };
+
+    // 이메일에서 도메인 추출
+    function extractDomain(email) {
+      if (!email || typeof email !== 'string') return null;
+      const atIndex = email.indexOf('@');
+      if (atIndex === -1) return null;
+      return email.substring(atIndex + 1).toLowerCase().trim();
+    }
+
+    // 도메인을 대학명으로 변환 (서브도메인 매칭 지원)
+    function domainToUniversity(domain) {
+      if (!domain) return null;
+      
+      // 1. 정확한 매칭 먼저 시도
+      if (DOMAIN_TO_UNIVERSITY[domain]) {
+        return DOMAIN_TO_UNIVERSITY[domain];
+      }
+      
+      // 2. 서브도메인 매칭: mail.snu.ac.kr → snu.ac.kr
+      const parts = domain.split('.');
+      for (let i = 1; i < parts.length; i++) {
+        const parentDomain = parts.slice(i).join('.');
+        if (DOMAIN_TO_UNIVERSITY[parentDomain]) {
+          return DOMAIN_TO_UNIVERSITY[parentDomain];
+        }
+      }
+      
+      return null;
+    }
 
     function App() {
       const [rawRecords, setRawRecords] = useState([]);
@@ -24,63 +200,85 @@
       const [error, setError] = useState(null);
       const [loading, setLoading] = useState(true);
       const [lastUpdated, setLastUpdated] = useState(null);
+      const [unmappedDomains, setUnmappedDomains] = useState([]);
+      const [showUnmapped, setShowUnmapped] = useState(false);
 
       const parseData = useCallback(function(jsonData) {
         const records = [];
         const univSet = new Set();
+        const unmappedSet = new Set();
+        
         for (let i = 0; i < jsonData.length; i++) {
           const item = jsonData[i];
-          const timeStr = String(item.time || '');
-          const university = String(item.university || '').trim();
-          if (!university || !timeStr) continue;
+          const timeStr = String(item.records || '');
           
+          // universities 필드의 도메인을 대학명으로 변환
+          const domain = String(item.universities || '').trim().toLowerCase();
+          if (!domain) continue;
+          
+          const university = domainToUniversity(domain) || domain;
+          if (!domainToUniversity(domain)) {
+            unmappedSet.add(domain);
+          }
+          
+          if (!timeStr) continue;
+
           // ISO 8601 형식: 2025-11-25T08:08:45.000Z
           let match = timeStr.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
           if (match) {
             const dateObj = new Date(timeStr);
-            records.push({ 
-              year: dateObj.getFullYear(), 
-              month: dateObj.getMonth() + 1, 
-              day: dateObj.getDate(), 
-              hour: dateObj.getHours(), 
-              date: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()), 
-              university: university 
+            records.push({
+              year: dateObj.getFullYear(),
+              month: dateObj.getMonth() + 1,
+              day: dateObj.getDate(),
+              hour: dateObj.getHours(),
+              date: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()),
+              university: university,
+              originalDomain: domain
             });
             univSet.add(university);
             continue;
           }
-          
+
           // MM/DD/YYYY HH:MM:SS 형식
           match = timeStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):/);
           if (match) {
-            records.push({ 
-              year: parseInt(match[3]), 
-              month: parseInt(match[1]), 
-              day: parseInt(match[2]), 
-              hour: parseInt(match[4]), 
-              date: new Date(match[3], match[1] - 1, match[2]), 
-              university: university 
+            records.push({
+              year: parseInt(match[3]),
+              month: parseInt(match[1]),
+              day: parseInt(match[2]),
+              hour: parseInt(match[4]),
+              date: new Date(match[3], match[1] - 1, match[2]),
+              university: university,
+              originalDomain: domain
             });
             univSet.add(university);
             continue;
           }
-          
+
           // YYYY-MM-DD HH:MM:SS 형식
           match = timeStr.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s+(\d{1,2}):/);
           if (match) {
-            records.push({ 
-              year: parseInt(match[1]), 
-              month: parseInt(match[2]), 
-              day: parseInt(match[3]), 
-              hour: parseInt(match[4]), 
-              date: new Date(match[1], match[2] - 1, match[3]), 
-              university: university 
+            records.push({
+              year: parseInt(match[1]),
+              month: parseInt(match[2]),
+              day: parseInt(match[3]),
+              hour: parseInt(match[4]),
+              date: new Date(match[1], match[2] - 1, match[3]),
+              university: university,
+              originalDomain: domain
             });
             univSet.add(university);
           }
         }
+        
         if (records.length === 0) throw new Error('유효한 데이터를 찾을 수 없습니다.');
-        return { records: records, universities: Array.from(univSet).sort() };
+        
+        return {
+          records: records,
+          universities: Array.from(univSet).sort(),
+          unmapped: Array.from(unmappedSet).sort()
+        };
       }, []);
 
       const loadFromGoogleSheets = useCallback(function() {
@@ -95,6 +293,7 @@
             const result = parseData(jsonData);
             setRawRecords(result.records);
             setUniversities(result.universities);
+            setUnmappedDomains(result.unmapped);
             setSelectedUniversity('all');
             setLastUpdated(new Date());
             setLoading(false);
@@ -107,8 +306,8 @@
           });
       }, [parseData]);
 
-      useEffect(function() { 
-        loadFromGoogleSheets(); 
+      useEffect(function() {
+        loadFromGoogleSheets();
       }, [loadFromGoogleSheets]);
 
       const filteredRecords = useMemo(function() {
@@ -125,54 +324,69 @@
         const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
         const currentDate = new Date(startDate);
         while (currentDate <= endDate) {
-          dates.push({ 
-            key: (currentDate.getMonth() + 1) + '/' + currentDate.getDate(), 
-            dayName: dayNames[currentDate.getDay()], 
-            fullDate: new Date(currentDate) 
+          dates.push({
+            key: (currentDate.getMonth() + 1) + '/' + currentDate.getDate(),
+            dayName: dayNames[currentDate.getDay()],
+            fullDate: new Date(currentDate)
           });
           currentDate.setDate(currentDate.getDate() + 1);
         }
         const matrix = {};
         const dailyTotals = {};
-        dates.forEach(function(d) { 
-          matrix[d.key] = {}; 
-          dailyTotals[d.key] = 0; 
-          for (let h = 0; h < 24; h++) matrix[d.key][h] = 0; 
+        dates.forEach(function(d) {
+          matrix[d.key] = {};
+          dailyTotals[d.key] = 0;
+          for (let h = 0; h < 24; h++) matrix[d.key][h] = 0;
         });
-        filteredRecords.forEach(function(record) { 
-          const dateKey = record.month + '/' + record.day; 
-          if (matrix[dateKey]) { 
-            matrix[dateKey][record.hour]++; 
-            dailyTotals[dateKey]++; 
-          } 
+        filteredRecords.forEach(function(record) {
+          const dateKey = record.month + '/' + record.day;
+          if (matrix[dateKey]) {
+            matrix[dateKey][record.hour]++;
+            dailyTotals[dateKey]++;
+          }
         });
         let maxHourlyCount = 0;
-        dates.forEach(function(d) { 
+        dates.forEach(function(d) {
           for (let h = 0; h < 24; h++) {
-            if (matrix[d.key][h] > maxHourlyCount) maxHourlyCount = matrix[d.key][h]; 
+            if (matrix[d.key][h] > maxHourlyCount) maxHourlyCount = matrix[d.key][h];
           }
         });
         const maxDailyTotal = Math.max.apply(null, Object.values(dailyTotals));
-        return { 
-          dates: dates, 
-          matrix: matrix, 
-          dailyTotals: dailyTotals, 
-          maxHourlyCount: maxHourlyCount, 
-          maxDailyTotal: maxDailyTotal, 
-          totalCount: filteredRecords.length, 
-          startDate: startDate, 
-          endDate: endDate 
+        return {
+          dates: dates,
+          matrix: matrix,
+          dailyTotals: dailyTotals,
+          maxHourlyCount: maxHourlyCount,
+          maxDailyTotal: maxDailyTotal,
+          totalCount: filteredRecords.length,
+          startDate: startDate,
+          endDate: endDate
         };
       }, [filteredRecords]);
 
       const universityStats = useMemo(function() {
         const stats = {};
-        rawRecords.forEach(function(r) { 
-          stats[r.university] = (stats[r.university] || 0) + 1; 
+        rawRecords.forEach(function(r) {
+          stats[r.university] = (stats[r.university] || 0) + 1;
         });
         return Object.entries(stats)
           .sort(function(a, b) { return b[1] - a[1]; })
           .map(function(entry) { return { name: entry[0], count: entry[1] }; });
+      }, [rawRecords]);
+
+      // 매핑된 대학 vs 미매핑 도메인 통계
+      const mappingStats = useMemo(function() {
+        let mapped = 0;
+        let unmapped = 0;
+        rawRecords.forEach(function(r) {
+          if (DOMAIN_TO_UNIVERSITY[r.originalDomain] || 
+              (r.originalDomain && domainToUniversity(r.originalDomain))) {
+            mapped++;
+          } else {
+            unmapped++;
+          }
+        });
+        return { mapped, unmapped };
       }, [rawRecords]);
 
       function getColor(count, maxCount) {
@@ -210,8 +424,8 @@
             {data.dates.map(function(d) {
               const count = data.matrix[d.key][hour];
               return (
-                <div 
-                  key={d.key + '-' + hour} 
+                <div
+                  key={d.key + '-' + hour}
                   className={'w-14 h-5 m-0.5 rounded cursor-pointer transition-all hover:ring-2 hover:ring-white/50 flex items-center justify-center ' + getColor(count, data.maxHourlyCount)}
                   onMouseEnter={function() { setHoveredCell({ date: d.key, hour: hour, count: count }); }}
                   onMouseLeave={function() { setHoveredCell(null); }}
@@ -234,6 +448,41 @@
               <h1 className="text-2xl font-bold text-white">대학별 활동 히트맵</h1>
               {lastUpdated && <span className="text-slate-500 text-sm">마지막 업데이트: {formatTime(lastUpdated)}</span>}
             </div>
+            
+            {/* 매핑 통계 표시 */}
+            {rawRecords.length > 0 && (
+              <div className="mb-4 flex items-center gap-4 text-sm">
+                <span className="text-green-400">✓ 매핑됨: {mappingStats.mapped}건</span>
+                {mappingStats.unmapped > 0 && (
+                  <button 
+                    onClick={function() { setShowUnmapped(!showUnmapped); }}
+                    className="text-yellow-400 hover:text-yellow-300 underline"
+                  >
+                    ⚠ 미매핑: {mappingStats.unmapped}건 ({unmappedDomains.length}개 도메인)
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* 미매핑 도메인 목록 (토글) */}
+            {showUnmapped && unmappedDomains.length > 0 && (
+              <div className="mb-4 p-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
+                <h3 className="text-yellow-400 font-bold mb-2">미매핑 도메인 목록 (매핑 테이블에 추가 필요)</h3>
+                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                  {unmappedDomains.map(function(domain) {
+                    return (
+                      <span key={domain} className="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs font-mono">
+                        {domain}
+                      </span>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-slate-400 text-xs">
+                  위 도메인들을 DOMAIN_TO_UNIVERSITY 테이블에 추가하면 대학명으로 자동 변환됩니다.
+                </p>
+              </div>
+            )}
+            
             <div className="mb-6 flex flex-wrap items-center gap-3">
               <button onClick={loadFromGoogleSheets} disabled={loading} className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
                 {loading ? '로딩 중...' : '새로고침'}
@@ -241,7 +490,7 @@
               {universities.length > 0 && (
                 <select value={selectedUniversity} onChange={function(e) { setSelectedUniversity(e.target.value); }} className="px-4 py-2 bg-slate-700 text-white rounded-lg border border-slate-600">
                   <option value="all">전체 대학 ({rawRecords.length}건)</option>
-                  {universityStats.map(function(item) { 
+                  {universityStats.map(function(item) {
                     return <option key={item.name} value={item.name}>{item.name} ({item.count}건)</option>;
                   })}
                 </select>
@@ -259,7 +508,7 @@
                 <div className="lg:col-span-3">
                   <p className="text-slate-400 mb-4">
                     {formatDate(data.startDate)} ~ {formatDate(data.endDate)}
-                    {selectedUniversity !== 'all' && (' | ' + selectedUniversity)} 
+                    {selectedUniversity !== 'all' && (' | ' + selectedUniversity)}
                     (총 {data.totalCount.toLocaleString()}건)
                   </p>
                   <div className="flex items-center gap-2 mb-4 text-sm text-slate-400">
@@ -279,9 +528,9 @@
                     <div className="min-w-max">
                       <div className="flex">
                         <div className="w-10"></div>
-                        {data.dates.map(function(d) { 
+                        {data.dates.map(function(d) {
                           return (
-                            <div key={d.key} className="w-14 text-center text-slate-300 text-xs font-medium pb-1">
+                            <div key={d.key} className="w-14 m-0.5 text-center text-slate-300 text-xs font-medium pb-1">
                               {d.key}<br/><span className="text-slate-500">({d.dayName})</span>
                             </div>
                           );
@@ -289,9 +538,9 @@
                       </div>
                       <div className="flex items-center mb-1">
                         <div className="w-10 text-right pr-1 text-slate-400 text-xs font-bold">합계</div>
-                        {data.dates.map(function(d) { 
-                          const total = data.dailyTotals[d.key]; 
-                          const isMax = total === data.maxDailyTotal && total > 0; 
+                        {data.dates.map(function(d) {
+                          const total = data.dailyTotals[d.key];
+                          const isMax = total === data.maxDailyTotal && total > 0;
                           return (
                             <div key={'total-' + d.key} className={'w-14 h-6 m-0.5 rounded flex items-center justify-center font-bold text-xs ' + (isMax ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-200')}>
                               {total}
@@ -329,17 +578,21 @@
                   <div className="bg-slate-800/50 rounded-2xl p-4">
                     <h2 className="text-white font-bold mb-3">대학별 현황</h2>
                     <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {universityStats.map(function(item, index) { 
-                        const percentage = (item.count / rawRecords.length * 100).toFixed(1); 
-                        const isSelected = selectedUniversity === item.name; 
+                      {universityStats.map(function(item, index) {
+                        const percentage = (item.count / rawRecords.length * 100).toFixed(1);
+                        const isSelected = selectedUniversity === item.name;
+                        const isMapped = !unmappedDomains.includes(item.name);
                         return (
-                          <div 
-                            key={item.name} 
-                            onClick={function() { handleUniversityClick(item.name); }} 
+                          <div
+                            key={item.name}
+                            onClick={function() { handleUniversityClick(item.name); }}
                             className={'p-2 rounded-lg cursor-pointer transition-all ' + (isSelected ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-slate-700 hover:bg-slate-600')}
                           >
                             <div className="flex justify-between items-center">
-                              <span className="text-white text-sm font-medium truncate">{index + 1}. {item.name}</span>
+                              <span className={'text-sm font-medium truncate flex items-center gap-1 ' + (isMapped ? 'text-white' : 'text-yellow-400')}>
+                                {index + 1}. {item.name}
+                                {!isMapped && <span className="text-xs">⚠</span>}
+                              </span>
                               <span className="text-slate-300 text-sm ml-2">{item.count}</span>
                             </div>
                             <div className="mt-1 h-1.5 bg-slate-600 rounded-full overflow-hidden">
