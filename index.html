@@ -17,7 +17,6 @@
     
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1NuTdFE4z58q599xCByoUP6oLejwCurvjzgztwSSWMAM/edit';
 
-    // 도메인 → 학교명 매핑 테이블
     const DOMAIN_TO_UNIVERSITY = {
       // 서울 주요대
       'snu.ac.kr': '서울대학교',
@@ -34,9 +33,13 @@
       'khu.ac.kr': '경희대학교',
       'khcu.ac.kr': '경희사이버대학교',
       'konkuk.ac.kr': '건국대학교',
+      'kku.ac.kr': '건국대학교',
+      
       'ewha.ac.kr': '이화여자대학교',
       'ewhain.net': '이화여자대학교',
       'i.ewha.ac.kr': '이화여자대학교',
+      'ewhai.net': '이화여자대학교',
+    
       'g.seoultech.ac.kr': '서울과학기술대학교',
       'seoultech.ac.kr': '서울과학기술대학교',
       'kau.kr': '한국항공대학교',
@@ -48,10 +51,15 @@
       'kyungsung.ac.kr': '경성대학교',
       'knue.ac.kr': '한국교원대학교',
       'chauniv.ac.kr': '차의과학대학교',
+      'cha.ac.kr': '차의과학대학교',
+      'student.cha.ac.kr': '차의과학대학교',
       'assist.ac.kr': '서울과학종합대학원대학교',
       'stud.assist.ac.kr': '서울과학종합대학원대학교',
       'stud.assist.edu.kr': '서울과학종합대학원대학교',
       'mju.ac.kr': '명지대학교',
+      'puts.ac.kr': '장로회신학대학교',
+      
+    
       'u.sogang.ac.kr': '서강대학교',
       'sogang.ac.kr': '서강대학교',
       'sungshin.ac.kr': '성신여자대학교',
@@ -78,32 +86,34 @@
       'kyungnam.ac.kr': '경남대학교',
       'kangnam.ac.kr': '강남대학교',
       'sangmyung.kr': '상명대학교',
-      'ds.ac.kr': '덕성여자대학교',
+      'ds.ac.kr': '덕성여자대학교',  
       'duksung.ac.kr': '덕성여자대학교',
-      'ks.ac.kr': '경성대학교',
+      'ks.ac.kr': '경성대학교',  
       'cku.ac.kr': '가톨릭관동대학교',
-      'ut.ac.kr': '한국교통대학교',
-      'a.ut.ac.kr': '한국교통대학교',
-      'knou.ac.kr': '한국방송통신대학교',
+      'ut.ac.kr': '한국교통대학교',  
+      'a.ut.ac.kr': '한국교통대학교',  
+      'knou.ac.kr': '한국방송통신대학교',  
       'handong.ac.kr': '한동대학교',
       'sch.ac.kr': '순천향대학교',
       'koreatech.ac.kr': '한국기술교육대학교',
       'gm.hannam.ac.kr': '한남대학교',
-
+      
+      
       // 경기/인천
       'ajou.ac.kr': '아주대학교',
       'inha.ac.kr': '인하대학교',
       'inha.edu': '인하대학교',
-      'office.inha.ac.kr': '인하대학교',
+      'office.inha.ac.kr': '인하대학교',  
       'gachon.ac.kr': '가천대학교',
       'dankook.ac.kr': '단국대학교',
       'kookmin.ac.kr': '국민대학교',
       'kwangwoon.ac.kr': '광운대학교',
-      'kw.ac.kr': '광운대학교',
+      'kw.ac.kr': '광운대학교',  
       'inu.ac.kr': '인천대학교',
-      'suwon.ac.kr': '수원대학교',
-      'deu.ac.kr': '동의대학교',
-
+      'suwon.ac.kr': '수원대학교',  
+      'deu.ac.kr': '동의대학교',  
+      
+      
       // 과기원
       'kaist.ac.kr': 'KAIST',
       'postech.ac.kr': 'POSTECH',
@@ -111,9 +121,13 @@
       'gist.ac.kr': 'GIST',
       'gm.gist.ac.kr': 'GIST',
       'gm.gist.kr': 'GIST',
+      'gist.gm.ac.kr': 'GIST',
+    
       'dgist.ac.kr': 'DGIST',
+    
+    
       'kentech.ac.kr': 'KENTECH',
-
+      
       // 지방 국립대
       'pusan.ac.kr': '부산대학교',
       'kyungpook.ac.kr': '경북대학교',
@@ -130,37 +144,40 @@
       'pknu.ac.kr': '국립부경대학교',
       'kongju.ac.kr': '국립공주대학교',
       'smail.kongju.ac.kr': '국립공주대학교',
-      'kumoh.ac.kr': '국립금오공과대학교',
-      'edu.dju.ac.kr': '대전대학교',
+      'kumoh.ac.kr' :'국립금오공과대학교',
+      'edu.dju.ac.kr' :'대전대학교',
       'office.hknu.ac.kr': '한경국립대학교',
       'knuh.ac.kr': '한국전통문화대학교',
       'hanbat.ac.kr': '국립한밭대학교',
       'mail.ube.ac.kr': '국제뇌교육종합대학원대학교',
-
+      
       // 지방 사립대
       'yu.ac.kr': '영남대학교',
+      'ynu.ac.kr': '영남대학교',
       'inje.ac.kr': '인제대학교',
+      'donga.ac.kr': '동아대학교',
       'dau.ac.kr': '동아대학교',
       'ulsan.ac.kr': '울산대학교',
       'mail.ulsan.ac.kr': '울산대학교',
-      'hs.ac.kr': '한신대학교',
-      'daegu.ac.kr': '대구대학교',
-      'chosun.ac.kr': '조선대학교',
-      'chosun.kr': '조선대학교',
-      'chungbuk.ac.kr': '충북대학교',
-      'jj.co.kr': '전주대학교',
-      'jj.ac.kr': '전주대학교',
-      'office.jejunu.ac.kr': '제주대학교',
-      'stu.jejunu.ac.kr': '제주대학교',
-      'cu.ac.kr': '대구가톨릭대학교',
-      'g.kmou.ac.kr': '한국해양대학교',
-      'changwon.ac.kr': '창원대학교',
-      'gs.cwnu.ac.kr': '창원대학교',
-      'mokpo.ac.kr': '목포대학교',
-      'vision.hoseo.edu': '호서대학교',
-      'kunsan.ac.kr': '군산대학교',
-      'gwnu.ac.kr': '강릉원주대학교',
-      'student.cnue.ac.kr': '춘천교육대학교',
+      'hs.ac.kr' :'한신대',
+      'daegu.ac.kr' :'대구대',
+      'chosun.ac.kr' :'조선대학교',
+      'chosun.kr' :'조선대학교',
+      'chungbuk.ac.kr' :'충북대학교',
+      'jj.co.kr' :'전주대학교',
+      'jj.ac.kr' :'전주대학교',
+      'office.jejunu.ac.kr' :'제주대학교',
+      'stu.jejunu.ac.kr' :'제주대학교',
+      'cu.ac.kr' :'대구가톨릭대학교',
+      'g.kmou.ac.kr' :'한국해양대학교',
+      'changwon.ac.kr' :'창원대학교',
+      'gs.cwnu.ac.kr' :'창원대학교',
+      'mokpo.ac.kr' :'목포대학교',
+      'vision.hoseo.edu' :'호서대학교',
+      'kunsan.ac.kr' :'군산대학교',
+      'gwnu.ac.kr' :'강릉원주대학교',
+      'student.cnue.ac.kr' :'춘천교육대학교',
+      'bufs.ac.kr' :'부산외국어대학교',
     };
 
     // 이메일에서 도메인 추출
